@@ -1,6 +1,6 @@
-# Hands-On_Machine-Learning_Study
-### Useing California Housing Prices datasets
-##### Data downloading
+# Hands on machine learning
+## 02_end_to_end_machine_learning_project.
+### 데이터 가져오기
 ```py
 from pathlib import Path
 import pandas as pd
@@ -8,39 +8,52 @@ import tarfile
 import urllib.request
 
 def load_housing_data():
-    tarball_path=Path("datasets/housing.tgz") #경로 객체 생성
-    if not tarball_path.is_file(): # tarball_path == empty 이면 실행
+    tarball_path = Path("datasets/housing.tgz")
+    if not tarball_path.is_file():
         Path("datasets").mkdir(parents=True, exist_ok=True)
-        url="https://github.com/ageron/data/raw/main/housing.tgz"
-        urllib.request.urlretrive(url, tarball_path) #urlretrieve() 로 tarball_path에 파일저장
-        with tarfile.open(tarball_path) as housing_tarball: #with문으로 close 해줌
-            housing_tarball.extractcall(path="datasets") #받아온 파일을 housing_tarball에 저장후 datasets파일에 extract 해줌
+        url = "https://github.com/ageron/data/raw/main/housing.tgz"
+        urllib.request.urlretrieve(url, tarball_path)
+        with tarfile.open(tarball_path) as housing_tarball:
+            housing_tarball.extractall(path="datasets")
     return pd.read_csv(Path("datasets/housing/housing.csv"))
 
-housing=load_housing_data()
+housing = load_housing_data()
 ```
-### Classification
-##### Mnist
-```py
-from sklearn.datasets import fetch_openml
-mnist=fetch_openml('mnist_784',as_frame=False)
-mnist.keys()
-```
-```py
-X,y=mnist.data,mnist.target
-```
-```py
-import matplotlib.pyplot as plt
+<br>
 
-def plot_digit(image_data): # X안에 있는 데이터를 28,28로 reshape 해줘야 함 픽셀 데이터이기 때문
-    image=image_data.reshape(28,28) 
-    plt.imshow(image,cmap="binary") #cmap변수를 안넣어줘도 되고 gray로 넣어줘도 되고 binary로 넣어줘도 됨 색깔차이임, binary가 젤 보기 좋음
-    plt.axis("off")
+### 데이터 구조 훑어 보기
 
-for i in range(10):
-    plot_digit(X[i])
-    plt.show()
-```
 ```py
-X_train,X_test,y_train,y_test=X[:60000],X[60000:],y[:60000],y[60000:] #mnist 데이터셋은 훈련세트 60000개, 테스트세트 10000개로 이미 나눠져 있는 데이터셋임
+housing.head()
+housing.info()
+housing["occean_proximity"].value_counts()
+housing.describe()
+
+housing.hist(bins=50, fizsize=(12,8))
+plt.show()
+```
+<br>
+
+### 테스트 세트 만들기
+- shuffle_end_split_data() 를 사용한 테스트세트 만들기
+```py
+import numpy as np
+
+def shuffle_and_split_data(data, test_ratio):
+    shuffled_indices = np.random.permutation(len(data))
+    test_set_size = int(len(data) * test_ratio)
+    test_indices = shuffled_indices[:test_set_size]
+    train_indices = shuffled_indices[test_set_size:]
+    return data.iloc[train_indices], data.iloc[test_indices]
+
+train_set, test_set = shuffle_end_split_data(housing, 0.2)
+np.random.seed(42)
+```
+<br>
+
+- sklearn - train_tesdt_split 를 사용한 테스트세트 만들기
+```py
+from sklearn.model_selection import train_test_split
+
+train_set, test_set = train_test_split(housing, test_size=0.2, random_state=42)
 ```
