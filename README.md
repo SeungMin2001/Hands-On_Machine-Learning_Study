@@ -117,4 +117,21 @@ strat_test_set["income_cat"].value_counts() / len(strat_test_set)
 for set_ in (strat_train_set, strat_test_set):
     set_.drop("income_cat", axis=1, inplace=True)
 ```
+<br>
 
+### 데이터 이해를 위한 탐색과 시각화
+- 지리적 데이터 시각화
+```py
+housing.plot(kind="scatter", x="longitude", y="latitude", grid=True, alpha=0.2) #grid=격자,alpha=투명도
+plt.show()
+```
+<br>
+
+```py
+# 원의 반지름(인구수) = s , 색상(가격) = c , 컬러맵 = cmap (jet 사용)
+housing.plot.scatter(x="longitude", y="latitude", grid=True,
+             s=housing["population"] / 100, label="population",
+             c="median_house_value", cmap="jet", colorbar=True,
+             legend=True, figsize=(10, 7))
+plt.show()
+```
