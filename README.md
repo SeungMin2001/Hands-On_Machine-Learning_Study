@@ -188,10 +188,50 @@ housing_labels = strat_train_set["median_house_value"].copy()
 ```
 <br>
 
-- 데이터 정제
+- 데이터 정제 (옵션 3개가 있음)
+    1. 해당 구역을 제거
+    2. 전체 특성을 삭제
+    3. 누락된 값을 어떤 값으로 채움(0,평균,중간값 등) 이를 Imputation(대체)
 ```py
+housing.dropna(subset=["total_bedrooms"], inplace=True)    # 옵션 1
+
+housing.drop("total_bedrooms", axis=1)                     # 옵션 2
+
+median = housing["total_bedrooms"].median()                # 옵션 3
+housing["total_bedrooms"].fillna(median, inplace=True)
 
 ```
+<br>
+
+- 데이터를 최대한 유지하기 위해 옵션3을 선택, sklearn 에 SimpleImputer 를 사용
+```py
+from sklearn.impute import SimpleImputer
+imputer =  SimpleImputer(strategy="median") # 중간값으로 채워준다.
+```
+
+- 범주형 데이터를 제외한 숫자형 데이터들만 선택해서 housing_num에 넣어주는 과정
+```py
+housing_num = housing.select_dtypes(include=[np.number])
+```
+<br>
+
+- fit을 통해 미리 지정해둔 median 값으로 결측치를 대체하는 과정
+```py
+# 이 데이터세트에는 total_bedrooms에만 결측치가 있지만, 새로운 데이터셋이 들어왔을때 어느 컬림에 결측치가 있는지 파악이 힘드므로 모든 컬럼에 대해 imputer.fit을 해준다.(단 수치형만)
+imputer.fit(housing_num)
+```
+- 마지막으로 계산된 통계값(중앙값 등) 을 저장 및 출력
+```py
+imputer.statistics_
+# = housing_num.median().values 같은 결과를 나타내는 코드
+
+X=imputer.transform(housing_num)
+# transform은 데이터 수정이 아닌 새로운 배열을 반환함!! 중요
+# transform 을 실행하려면 반드시 fit 이 선행되야함!! 중요
 
 
+# 즉 fit을 통해 중앙값을 계산, 그리고 statistics 속성에 저장. 단 housing_num을 변형하진 읺음
+# transform 을 실행하면 statistics 에 저장된 값으로 "대체" 하는 과정!
+```
+<br>
 
