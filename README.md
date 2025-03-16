@@ -135,3 +135,63 @@ housing.plot.scatter(x="longitude", y="latitude", grid=True,
              legend=True, figsize=(10, 7))
 plt.show()
 ```
+<br>
+
+### 상관관계 조사하기
+- 보통 피어슨의 상관계수를 활용해서 구한다. 1=비례함수, 0=상관관계 없음, -1=음의 비례함수
+```py
+corr_matrix = housing.corr(numeric_only=True)
+# 판다스 2.0 버전에서 기본값이 False로 저절로 바뀜, 그래서 numeric_only=True로 지정해줘야함
+# numeric_only = True 안해주면 오류발생. 범주형 변수때문에. 
+
+corr_matrix["median_house_value"].sort_values(ascending=False)
+# corr_matrix에서 median_house_value 를 기준으로 한 상관관계를 정렬해서 출력(asending=True:오룸차순, asendinf=False:내림차순)
+# ascending 기본값은 False 즉 내림차순 이므로 오름차순 하고싶을때만 asceding=True 값을 넣어주면 된다.
+```
+<br>
+
+- 여러 산점도를 보여주는 scatter_matrix
+```py
+# scatter_matrix 함수를 이용하여 여러개의 상관관계 산점도를 그릴수 있음
+# 상관관계를 수치적으로 미리 구한 corr_matrix를 사용하지 않는이유 : scatter_matrix함수가 housing 안에 있는 데이터들의 산점도를 나타내주면 시각적으로 상관관계를 볼수 있게 되는것
+# corr_matrix를 사용해서 시각화 하려면 seaborn-heatmap을 사용해야함. scatter_matrix로는 corr_matrix를 사용한 시각화를 못함
+from pandas.plotting import scatter_matrix
+attributes=["median_house_value", "median_inocme", "total_rooms", "housing_median_age"]
+scatter_matrix(housing[attribute], figsize(12,8))
+plt.show()
+```
+<br>
+<b>scatter_matrix 결과를 보면 median_income,median_house_value 이 두개의 상관관계가 강해보인다는것을 알수 있다 (중요!)</b>
+<br><b>단 선형적인 관계에서의 상관계수 관계만을 봐야함. 비선형적인 관계의 데이터들에서 상관관계를 분석하면 안됨</b>
+<br>
+
+### 특정 조합으로 데이터들의 인사이트 얻기
+- ex): 가구강 방 개수 = 전체 방 / 전체 가구
+```py
+housing["rooms_per_house"] = housing["total_rooms"] / housing["households"]
+housing["bedrooms_ratio"] = housing["total_bedrooms"] / housing["total_rooms"]
+housing["people_per_house"] = housing["population"] / housing["households"]
+
+corr_matrix = housing.corr(numeric_only=True)
+corr_matrix["median_house_value"].sort_values(ascending=False)
+
+# 이렇게 조합을 통해 새로운 변수를 만들고 상관관계를 구해보면 훨씬 유의미한 상관관계가 나타날수 있다.
+```
+<br>
+
+### 머신러닝 알고리즘을 위한 데이터 준비
+```py
+# 이전에 계층적 샘플링 해놓은 strat_train_set에서 median_house_value 열을 제거한 상태로 housing에 대입, 즉 X,Y 분리과정
+# 분리한 Y는 housing_labels에 저장 (지도학습 이기 때문에 Y(종속변수) 를 따로 저장)
+housing = strat_train_set.drop("median_house_value", axis=1)
+housing_labels = strat_train_set["median_house_value"].copy()
+```
+<br>
+
+- 데이터 정제
+```py
+
+```
+
+
+
