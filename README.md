@@ -235,3 +235,8 @@ X=imputer.transform(housing_num)
 ```
 <br>
 
+- 텍스트와 범주형 특성 다루기
+```py
+
+```
+
