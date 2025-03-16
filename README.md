@@ -1,4 +1,7 @@
 # Hands on machine learning
+> "Hands-On Machine Learning with Scikit-Learn Keras & Tensorflow" 의 대한 공부 기록."  
+> — Aurelien Geron, 《Hands-On Machine Learning with Scikit-Learn Keras & Tensorflow 3판》, 2023  
+
 ## 02_end_to_end_machine_learning_project.
 ### 데이터 가져오기
 ```py
