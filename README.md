@@ -285,6 +285,35 @@ pd.get_dummies(df_test)
 ```
 <br>
 
+- 특정 스케일링과 변환. (데이터를 일정한 범위로 변환하는 과정)
+<br>
+
+- MinMaxScaler = Normalization(정규화)
+```py
+from sklearn.preprocessing import MinMaxScaler
+min_max_scaler = MinMaxscaler(feture_range(-1,1))
+housing_num_min_max_scaled = min_max_scaler.fit_transform(housing_num) #fit_transform 을 여기서도 써줘야 값이 바뀜
+```
+<br>
+
+- StandardScaler = Standardization(표준화)
+```py
+# 희소행렬을 밀집행렬로 안바꾸고 스케일링 하고싶을때 표준화를 사용할때 with_mean=False를 해주면 평균을 내지 않고 표준편차로 나누기만 해서 가능하다.
+# 표준화를 하면 평균이 항상 0, 표준편차는 항상 1이 된다
+# 표준화는 이상치에 영향을 덜 받는다.
+from sklearn.preprocessing import StandardScaler
+std_scaler = StandardScaler()
+housing_num_std_scaled = std_scaler.fit_transform(housing_num)
+```
+<br>
+
+- 꼬리가 두꺼운 특성을 처리하는 방법 -> Bucketizing(버킷타이징:구간화).  (스케일링으로는 한계가 있음)
+- 특정한 범위로 나누어 범주형 데이터로 변환하는 방법 -> 버킷타이징
+- housing["housing_median_age"] 특성이 멀티모달 분포를 띄고있음(mode, 즉 정점이 두개 이상인 분포)
+- 멀티모달 분포 해결 -> 1.버킷타이징     2.방사 기저 함수(RBF)
+```py
+
+```
 
 
 
