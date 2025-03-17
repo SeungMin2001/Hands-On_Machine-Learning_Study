@@ -310,10 +310,57 @@ housing_num_std_scaled = std_scaler.fit_transform(housing_num)
 - 꼬리가 두꺼운 특성을 처리하는 방법 -> Bucketizing(버킷타이징:구간화).  (스케일링으로는 한계가 있음)
 - 특정한 범위로 나누어 범주형 데이터로 변환하는 방법 -> 버킷타이징
 - housing["housing_median_age"] 특성이 멀티모달 분포를 띄고있음(mode, 즉 정점이 두개 이상인 분포)
-- 멀티모달 분포 해결 -> 1.버킷타이징     2.방사 기저 함수(RBF)
-```py
+- 멀티모달 분포 해결, 멱법칙 분포 -> 1.버킷타이징     2.방사 기저 함수(RBF)
+<br>
 
+- 방사 기저 함수(RBF) = 거리 기반 함수
+```py
+from sklearn.metrics.pairwise import rbf_kernel
+
+age_simil_35 = rbf_kernel(housing[["housing_median_age"]], [[35]], gamma=0.1)
+# 즉 이 함수는 유사도를 측정한다. 얼마나 비슷한 값인가를 측정한다는 뜻이다.
+# gamma 값이 클수록 커널이 민감하게 반응한다, 값이 작을수록 더 넓은 범위의 데이터에 영향을 미칩니다.
+# housing_median_age 와 35와의 유사도를 age_simil_35 에 넣어주는 코드이다.
+# 예를 들어 10,20,30,40 데이터가 있을때 35와의 유사도는 30,40이 가장 클것이고 10이 가장 낮은 유사도를 가질것이다.
 ```
+<br>
+
+- 스케일링을 한 데이터로 결과가 나올때 원본 데이터로 결과를 보기 위한 역변환
+- sklearn.compose - TransformedTargetRegressor 사용
+```py
+from sklearn.compose import TransformedTargetRegressor
+
+model = TransformedTargetRegressor(LinearRegression(),
+                                   transformer=StandardScaler())
+model.fit(housing[["median_income"]], housing_labels)
+predictions = model.predict(some_new_data)
+```
+<br>
+
+- 사용자 정의 변환기
+- FunctionTransFormer 을 활용
+```py
+from sklearn.preprocessing import FunctionTransformer
+
+log_transformer = FunctionTransformer(np.log, inverse_func=np.exp)
+log_pop = log_transformer.transform(housing[["population"]])
+
+# FunctionTransFormer 인자값으로 데이터 변환을 수행할 함수, inverse_func=np.exp 라는 역변환 여부를 넣어준다.
+# housing["population"] 에 로그 변환을 적용한 코드
+```
+<br>
+
+- rbf_kernel 과 FunctionTransFormer 을 활용한 사용자 정의 변환
+```py
+rbf_transformer = FunctionTransformer(rbf_kernel,
+                                      kw_args=dict(Y=[[35.]], gamma=0.1))
+age_simil_35 = rbf_transformer.transform(housing[["housing_median_age"]])
+
+#
+```
+
+
+
 
 
 
