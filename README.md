@@ -1,6 +1,9 @@
 # Hands on machine learning
 > "Hands-On Machine Learning with Scikit-Learn Keras & Tensorflow" 의 대한 공부 기록."  
-> — Aurelien Geron, 《Hands-On Machine Learning with Scikit-Learn Keras & Tensorflow 3판》, 2023  
+> — Aurelien Geron, 《Hands-On Machine Learning with Scikit-Learn Keras & Tensorflow 3판》, 2023
+
+[2장-code](https://colab.research.google.com/github/rickiepark/handson-ml3/blob/main/02_end_to_end_machine_learning_project.ipynb#scrollTo=E4Js1hcvoyh6)
+<br>
 
 ## 02_end_to_end_machine_learning_project.
 ### 데이터 가져오기
@@ -240,6 +243,48 @@ X=imputer.transform(housing_num)
 
 - 텍스트와 범주형 특성 다루기
 ```py
-
+# 보통 변수명에 cat이 있으면 카테고리의 약자이므로 범주형 데이터를 가르킴
+# housing["ocean_proximity"] = 1차원 = Series
+# housing[["ocean_proximity"]] = 2차원 = FataFrame
 ```
+<br>
+
+- 범주형 데이터 (텍스트 데이터->숫자 데이터) 변환방법 : OrdinalEncoder
+```py
+# <주의!> 범주형 데이터간의 순서,크기가 없다면 쓰면 안됨. 모델이 숫자의 크기/순서 관계를 학습해버릴수 있기 때문!
+# ex: red=0, blue=1, green=2 일때 green>blue>red 이런식의 관계로 잘못 학습할수 있음! -> OneHotEncoder 을 사용해야함
+
+from skelarn.preprocessing import OrdinalEncoder
+
+ordinal_encoder = OrdinalEncoder()
+housing_cat_encoded = ordinal_encoder.fit_transform(housing_cat) #.fit_transform을 통한 변환
+
+ordinal_encoder.categories_  #categories_ 인스턴스 변수를 사용해 카테고리 리스트를 얻을수 있음
+```
+<br>
+
+- 범주형 데이터 (텍스트 데이터->숫자 데이터) 변환방법 : OneHotEncoder
+```py
+from sklearn.preprocessing import OrdinalEncoder
+
+ordinal_encoder = OrdinalEncoder()
+housing_cat_encoded = ordinal_encoder.fit_transform(housing_cat)
+
+# 희소행렬로 저장, numpy배열로 바꿀려면 toarray() 를 사용
+housing_cat_1hot.toarray()
+
+# sparse=False, sparse_output=False 로 해주면 transform() 메서드가 numpy 배열을 반환하도록 바꿀수 있음
+
+# 범주형 -> 원-핫 여기서 하나의 이진특성으로 표현하는 방법
+df_test = pd.DataFrame({"ocean_proximity": ["INLAND", "NEAR BAY"]})
+pd.get_dummies(df_test)
+
+# 왠만하면 oneHotEncoding .fit_transform 을 통해 범주형 데이터를 다루는게 좋다/
+```
+<br>
+
+
+
+
+
 
