@@ -311,6 +311,7 @@ housing_num_std_scaled = std_scaler.fit_transform(housing_num)
 - 특정한 범위로 나누어 범주형 데이터로 변환하는 방법 -> 버킷타이징
 - housing["housing_median_age"] 특성이 멀티모달 분포를 띄고있음(mode, 즉 정점이 두개 이상인 분포)
 - 멀티모달 분포 해결, 멱법칙 분포 -> 1.버킷타이징     2.방사 기저 함수(RBF)
+- 원-핫 인코딩 전에 버킷라이징을 해주고 실행할수 있음, 버킷라이징(수치형->범주형) -> 원-핫 인코딩(범주형->이진벡터)
 <br>
 
 - 방사 기저 함수(RBF) = 거리 기반 함수
@@ -345,19 +346,111 @@ from sklearn.preprocessing import FunctionTransformer
 log_transformer = FunctionTransformer(np.log, inverse_func=np.exp)
 log_pop = log_transformer.transform(housing[["population"]])
 
-# FunctionTransFormer 인자값으로 데이터 변환을 수행할 함수, inverse_func=np.exp 라는 역변환 여부를 넣어준다.
-# housing["population"] 에 로그 변환을 적용한 코드
+# FunctionTransFormer 인자값으로 데이터 변환을 수행할 함수, inverse_func=np.exp(지수함수) 라는 역변환 여부를 넣어준다.
+# housing["population"] 에 로그 변환을 적용한 코드 (log_transformer.transform()을 사용해서 변화)
 ```
 <br>
 
 - rbf_kernel 과 FunctionTransFormer 을 활용한 사용자 정의 변환
 ```py
+# 아직 이해하기 힘든 개념들이 있기 때문에 스킵
+
 rbf_transformer = FunctionTransformer(rbf_kernel,
                                       kw_args=dict(Y=[[35.]], gamma=0.1))
 age_simil_35 = rbf_transformer.transform(housing[["housing_median_age"]])
 
 #
 ```
+<br>
+
+- 변환 파이프라인
+```py
+# fit_transform()을 해줘야 데이터가 변환됨, 안하면 그냥 파이프라인 구조만 나타낼수 있음.
+from sklearnpipeline import Pipeline
+num_pipeline = Pipeline([
+    ("impute", SimpleImputer(strategy="median")),  # ->결측값 처리
+    ("standardize", StandardScaler()),   # -> 표준화 : 평균=0 표준편차=1로 변환한다.
+])
+
+# + fit, transform, fit+transform 의 차이점.
+# fit(): 학습만 수행
+# transform(): 이미 학습된 데이터를 변환만 수행
+# fit_transform(): 학습하고 그 값을 변환함.
+# 파이프라인은 fit_transform() 메서드를 가져야함
+```
+<br>
+
+- make_pipeline 사용하기
+```py
+# make_pipeline 이 이름을 자동으로 만들어줌(ex:SimpleImputer->simpleimputer)
+from sklearn.pipeline import make_pipeline
+num_pipeline(SimpleImputer(strategy="median"), StandarScaler())
+# Pipeline 과의 차이점은 이름을 안지어준다는점 하나다.
+# 만약 같은 이름이 있다면 뒤에 숫자를 붙혀서 구별한다.
+```
+<br>
+
+- housing_num을 파이프라인에 넣어보기
+```py
+housing_num_prepared = num_pipeline.fit_transform(housing_num)
+housing_num_prepared[:2].round(2)
+
+# 데이터프레임으로 재구성 하려면 get_feature_names_out() 을 사용
+df_housing_num_prepared = pd.DataFrame(
+    housing_num_prepared, columns=num_pipeline.get_feature_names_out(),
+    index=housing_num.index) # ->housing_num의 인덱스를 그대로 사용한다는 뜻 
+# get_feature_names_out : 변환된 특성 이름을 반환한다.
+# 예를들면 sstandardScaler를 사용하여 데이터의 각 열이 변환된 후, 각 특성에 대한 새로운 이름을 반환한다.
+
+# 1.get_feature_names_out() 으로 변환된 데이터 열들을 얻고 저장시킨다.
+# 2. 얻은 새로운 열들을 dataframe() 에 인자로 같이 넘겨준다.
+# 3. 넘파이 배열에서 데이터프레임 배열로 변환될때 인자로 넘겨준 컬럼인자로 새롭게 업데이트 된다.
+```
+<br>
+
+- ColumnTransform 사용하기
+- 각 영에 대해 서로 다른 변환을 동시에 적용할 수 있도록 도와주는 역할을 함
+```py
+from sklearn.compose import ColumnTransformer
+
+num_attribs = ["longitude", "latitude", "housing_median_age", "total_rooms",
+               "total_bedrooms", "population", "households", "median_income"]
+cat_attribs = ["ocean_proximity"]
+
+cat_pipeline = make_pipeline(
+    SimpleImputer(strategy="most_frequent"),
+    OneHotEncoder(handle_unknown="ignore"))
+
+preprocessing = ColumnTransformer([     # 각각 다른 파이프라인을 다른열에 한번에 적용할수 있음
+    ("num", num_pipeline, num_attribs),
+    ("cat", cat_pipeline, cat_attribs),
+])
+```
+<br>
+
+- make_column_selector, make_column_trasform 사용하기
+```py
+from sklearn.compose import make_column_selector, make_column_transformer
+
+preprocessing = make_column_transformer( # 이름 자동으로 만들어줌(pipeline1,pipeline2 이렇게 만들어짐
+    (num_pipeline, make_column_selector(dtype_include=np.number)), # np.number:수치형 데이터
+    (cat_pipeline, make_column_selector(dtype_include=object)), # object:범주형데이터,문자열
+)
+# 이렇게 각각의 파이프라인을 지정한 열에 적용할수 있음. 여기서 좋은점은 여러개의 열과 파이프라인을 한번에 매칭해서 실행할수 있다는 점임.
+```
+<br>
+
+- 내가 만든 파이프라인 적용하기
+```py
+housing_prepared=preprocessing.fit_transform(housing)
+# 여기서도 numpy배열로 반환되지만 dataframe 데이터로 반환할수 있음
+# preprocessing.get_feature_names_out() 을 사용해서
+```
+<br>
+
+
+
+
 
 
 
