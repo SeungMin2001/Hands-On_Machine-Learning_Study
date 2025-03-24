@@ -6,7 +6,7 @@
 
 [2장-code](https://colab.research.google.com/github/rickiepark/handson-ml3/blob/main/02_end_to_end_machine_learning_project.ipynb#scrollTo=E4Js1hcvoyh6)
 <br>
-[3장 분류]()
+[3장 분류](https://github.com/SeungMin2001/Hands-On_Machine-Learning_Study/tree/main/03.Classification)
 
 
 
