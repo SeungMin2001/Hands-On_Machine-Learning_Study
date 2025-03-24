@@ -448,9 +448,25 @@ housing_prepared=preprocessing.fit_transform(housing)
 ```
 <br>
 
+### 모델 선택과 훈련
 
+- 훈련 세트에서 훈련하고 평가하기
+```py
+from sklearn.linear_model import LinearRegression
 
+lin_reg = make_pipeline(preprocessing, LinearRegression())
+lin_reg.fit(housing, housing_labels)
 
+# 만들어놓은 파이프라인을 실행하고 그 다음 LinearRegression 을 실행하게 하는 코드
+# make_pipeline을 실행하면 preprocessing -> LinearRegression 을 하게 설정되고
+# fit을 돌려주면 학습을 하게 된다.
+```
+<br>
+
+### 교차 검증으로 평가하기 (이 부분부터는 책을 다 읽고 다시 돌아와서 학습하자)
+### 모세 미세 튜닝
+- 최적의 하이퍼파라미터 조합 찾기
+### 론칭, 모니터링, 시스템 유지 보수
 
 
 
