@@ -6,7 +6,11 @@
 
 [2장-code](https://colab.research.google.com/github/rickiepark/handson-ml3/blob/main/02_end_to_end_machine_learning_project.ipynb#scrollTo=E4Js1hcvoyh6)
 <br>
+[3장 분류]()
 
+
+
+<br>
 ## 02_end_to_end_machine_learning_project.
 ### 데이터 가져오기
 ```py
