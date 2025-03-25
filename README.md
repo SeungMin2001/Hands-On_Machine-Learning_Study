@@ -3,6 +3,7 @@
 
 > "Hands-On Machine Learning with Scikit-Learn Keras & Tensorflow" 의 대한 공부 기록."  
 > — Aurelien Geron, 《Hands-On Machine Learning with Scikit-Learn Keras & Tensorflow 3판》, 2023
+> 2장은 전반적인 내용을 다루므로 ReadMe에 저장, 나머지 장은 파일로 각각 저장한다.
 
 [2장-code](https://colab.research.google.com/github/rickiepark/handson-ml3/blob/main/02_end_to_end_machine_learning_project.ipynb#scrollTo=E4Js1hcvoyh6)
 <br>
