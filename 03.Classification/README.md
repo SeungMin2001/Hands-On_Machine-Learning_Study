@@ -262,4 +262,58 @@ recall_at_90_precision = recall_score(y_train_5, y_train_pred_90) # 정밀도 90
 ```
 <br>
 
-- ROC 곡선
+- ROC 곡선: y(새로축):재현율(recall), x(가로축):위양성률(FPR)
+- 즉 이 곡선은 모델이 Positive를 얼마나 잘 맞히는지와 잘못 맞히는 정도를 비교하는 그래프인것
+- sklearn.matrics -> roc_curve 사용 반환값으로 fpr(거짓양성비율),tpr(진짜양성비율),thershollds(임곗값) 나옴
+```py
+from sklearn.metrics import roc_curve
+fpr, tpr, thersholds = roc_curve(y_train_5,y_scores)
+
+idx_for_threshold_at_90 = (thresholds <= threshold_for_90_precision).argmax()
+tpr_90, fpr_90 = tpr[idx_for_threshold_at_90], fpr[idx_for_threshold_at_90]
+
+plt.figure(figsize=(6, 5))  # 추가 코드
+plt.plot(fpr, tpr, linewidth=2, label="ROC curve")
+plt.plot([0, 1], [0, 1], 'k:', label="Random classifier's ROC curve")
+plt.plot([fpr_90], [tpr_90], "ko", label="Threshold for 90% precision")
+```
+<br>
+
+- ROC곡선에도 트레이드오프가 존재함, 재현율(TPR)이 높을수록 분류기가 만드는 거짓 양성비율(FPR)이 늘어단다.
+- 곡선 아래의 면적(AUC)를 통해 측정가능, 완벽한 뷴류기의 AUC=1, 완전한 랜덤 분류기의 AUC=0.5가 나온다
+- sklearn에서 ROC의 AUC를 제공함
+```py
+from sklearn.metrics import roc_auc_score
+roc_auc_score(y_train_5,y_scores)
+```
+<br>
+
+- RandomForestClassifier 을 만들어 SGDClassifie의 PR곡선과 F1점수를 비교해보자.
+- RandomForestClassifier은 decision_function을 제공하지 않음. 다행히 predict_proba()는 제공함
+- predict_proba()란 각 샘플에 대한 클래스 확률을 봔환하는 역할을 하는 애임
+- 이제 랜덤포레스트 vs SGD 곡선을 그려서 비교해보면 랜덤포레스트 곡선이 훨씬 오른쪽 위로 붙어있는걸 확인할수있다.
+- 이는 AUC가 더 더 높다는 뜻이므로 랜덤포레스트 방법이 더 좋다는것을 알수가 있다.
+```py
+from sklearn.ensemble import RandomForestClassifier
+
+forest_clf = RandomForestClassifier(random_state=42)
+
+y_probas_forest = cross_val_predict(forest_clf, X_train, y_train_5, cv=3,
+                                    method="predict_proba")
+
+y_scores_forest = y_probas_forest[:, 1]
+precisions_forest, recalls_forest, thresholds_forest = precision_recall_curve(
+    y_train_5, y_scores_forest)
+
+plt.plot(recalls_forest, precisions_forest, "b-", linewidth=2,
+         label="Random Forest")
+plt.plot(recalls, precisions, "--", linewidth=2, label="SGD")
+```
+<br>
+
+- 지금까지 이진 분류기를 훈련하고 작업에 맞는 적절한 지표를 선택, 교차검증을 사용해서 평가를 했고
+- 요구사항에 맞는 정밀도/재현율 트레이드오프를 선택하고 여러가지 지표와 곡선을 사용해 여러 모델을 비교해봤다.
+- 이제는 숫자 5 이상을 감지해보는 내용을 공부해보자.
+
+### 다중분류
+
