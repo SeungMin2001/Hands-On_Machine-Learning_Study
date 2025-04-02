@@ -351,7 +351,34 @@ cross_val_score(sgd_clf, X_train_scaled, y_train, cv=3, scoring="accuracy")
 ```
 <br>
 
-- 오류분석
+### 오류분석
+- 오차행렬 살펴보기
+- cross_val_predict()을 사용해 predict을 구해놓고 confusion_matrix()를 호출
+- 이번 confusion_matrix는 클래스가 10개이기 때문에 보기쉽게 그래프로 표현
+- ConfusionMatrixDisplay.from_predictions()을 사용
 ```py
+from sklearn.metrics import ConfusionMatrixDisplay
 
+y_train_pred = cross_val_predict(sgd_clf, X_train_scaled, y_train, cv=3)
+plt.rc('font', size=9)  # 추가 코드 - 폰트 크기를 줄입니다
+ConfusionMatrixDisplay.from_predictions(y_train, y_train_pred)
+plt.show()
 ```
+<br>
+
+- 오차행렬을 정규화해주는게 좋은데 인자값 하나만 넣어주면 해결됨
+- "nomalize=true" 또 values_format=".0%" 이렇게 해주면 소수점 없이 백분율 표시됨
+```py
+ConfusionMatrixDisplay.from_predictions(y_train, y_train_pred,normalize="true", values_format=".0%")
+```
+<br>
+
+- 여기서 오류에 대한 값을 그래프에서 더 눈에 띄게 만들고싶으면 올바른 예측에 대한 가중치를 0으로 설정해주면 됨
+```py
+sample_weight = (y_train_pred != y_train)
+ConfusionMatrixDisplay.from_predictions(y_train, y_train_pred,sample_weight=sample_weight,normalize="true", values_format=".0%")
+```
+<br>
+
+- 오차행렬을 통한 오류분석은 성능향상방안에 인사이트를 얻을수 있음.
+- 정답을 8로 잘못 예측한 값이 높다면 8과 비슷한 데이터들을 좀더 많이 학습시켜주는 방향으로 설정해줄수 있기때문.
