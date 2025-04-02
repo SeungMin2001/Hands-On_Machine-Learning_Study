@@ -316,4 +316,42 @@ plt.plot(recalls, precisions, "--", linewidth=2, label="SGD")
 - 이제는 숫자 5 이상을 감지해보는 내용을 공부해보자.
 
 ### 다중분류
+- OvA,OvR : 10개의 이진분류기 학습 후 10개중 가장 점수가 높은애를 채택
+- OvO : 수들의 모든 조합에 대한 이진분류 시행
+- 즉 다중분류도 여러개의 이진분류의 집합 이라는 개념을 사용.
+- 서포트벡터머신(SVM 에 SVC를 사용해서 다중분류 시도)
+```py
+from sklearn.svm import SVC
 
+svm_clf = SVC(random_state=42)
+svm_clf.fit(X_train[:2000], y_train[:2000])  # y_train_5가 아니고 y_train을 사용합니다.
+# OvO방식 채택, 즉 45번의 이진분류 실행, 45번의 실행중 가장 많이 승리한 클래스를 최종선택하는 구조를 가짐
+
+some_digit_scores = svm_clf.decision_function([some_digit]) # 결정함수 사용
+some_digit_scores.round(2)
+```
+<br>
+
+- 사이킷런에서 강제적으로 OvO,OvR를 사용하려면 OneVsRestClassifier,OneVsOneClassifier를 사용해줘야함
+```py
+from sklearn.multiclass import OneVsRestClassifier
+
+ovr_clf = OneVsRestClassifier(SVC(random_state=42))
+ovr_clf.fit(X_train[:2000], y_train[:2000])
+
+sgd_clf = SGDClassifier(random_state=42) # 한번 예측 때려보기
+sgd_clf.fit(X_train, y_train)
+sgd_clf.predict([some_digit])
+
+from sklearn.preprocessing import StandardScaler
+
+scaler = StandardScaler()       # 스케일링을 통해 성능 올리기.
+X_train_scaled = scaler.fit_transform(X_train.astype("float64"))
+cross_val_score(sgd_clf, X_train_scaled, y_train, cv=3, scoring="accuracy")
+```
+<br>
+
+- 오류분석
+```py
+
+```
