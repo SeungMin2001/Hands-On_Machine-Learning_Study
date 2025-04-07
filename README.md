@@ -274,10 +274,10 @@ ordinal_encoder.categories_  #categories_ 인스턴스 변수를 사용해 카�
 
 - 범주형 데이터 (텍스트 데이터->숫자 데이터) 변환방법 : OneHotEncoder
 ```py
-from sklearn.preprocessing import OrdinalEncoder
+from sklearn.preprocessing import OneHotEncoder
 
-ordinal_encoder = OrdinalEncoder()
-housing_cat_encoded = ordinal_encoder.fit_transform(housing_cat)
+cat_encoder = OneHotEncoder()
+housing_cat_1hot = cat_encoder.fit_transform(housing_cat)
 
 # 희소행렬로 저장, numpy배열로 바꿀려면 toarray() 를 사용
 housing_cat_1hot.toarray()
