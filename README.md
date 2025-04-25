@@ -9,6 +9,9 @@
 <br>
 
 [3장 분류](https://github.com/SeungMin2001/Hands-On_Machine-Learning_Study/tree/main/03.Classification)
+<br>
+
+[4장 모델훈련](https://github.com/SeungMin2001/Hands-On_Machine-Learning_Study/tree/main/04.ModelTraining)
 
 
 
