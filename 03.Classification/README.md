@@ -382,3 +382,53 @@ ConfusionMatrixDisplay.from_predictions(y_train, y_train_pred,sample_weight=samp
 
 - 오차행렬을 통한 오류분석은 성능향상방안에 인사이트를 얻을수 있음.
 - 정답을 8로 잘못 예측한 값이 높다면 8과 비슷한 데이터들을 좀더 많이 학습시켜주는 방향으로 설정해줄수 있기때문.
+
+### 다중 레이블 분류
+
+```py
+import numpy as np
+from sklearn.neighbors import KNeighborsClassifier
+
+y_train_large = (y_train >= '7')
+y_train_odd = (y_train.astype('int8') % 2 == 1)
+y_multilabel = np.c_[y_train_large, y_train_odd]
+
+knn_clf = KNeighborsClassifier()
+knn_clf.fit(X_train, y_multilabel)
+```
+
+```py
+y_train_knn_pred = cross_val_predict(knn_clf, X_train, y_multilabel, cv=3)
+f1_score(y_multilabel, y_train_knn_pred, average="macro")
+```
+<br>
+- 각 레이블의 F1점수의 평균을 계산
+- 복습) cross_val_predict:교차검증(k-fold)
+- 위 코드는 모든 레이블에 가중치가 같다고 가정한것.
+- 만약 한 레이블의 데이터가 더 많다면 지지도(support:타깃 레이블에 속한 샘플 수) 를 가중치로 둘수 있음
+-  이는 average="weighted" 로 해주면 됨
+-  레이블 = 타깃변수,종속변수,y
+<br>
+<br>
+
+
+- ClassifierChain 사용
+- 레이블간에 상관성을 활용해 예측함
+```py
+from sklearn.multioutput import ClassifierChain
+
+chain_clf = ClassifierChain(SVC(), cv=3, random_state=42)
+chain_clf.fit(X_train[:2000], y_multilabel[:2000])
+```
+<br>
+
+- knn모델을 사용해서 노이즈를 없애주는 코드.
+```py
+knn_clf = KNeighborsClassifier()
+knn_clf.fit(X_train_mod, y_train_mod)
+clean_digit = knn_clf.predict([X_test_mod[0]])
+plot_digit(clean_digit)
+save_fig("cleaned_digit_example_plot")  # 추가 코드 – 그림 3–13을 저장합니다
+plt.show()
+```
+
