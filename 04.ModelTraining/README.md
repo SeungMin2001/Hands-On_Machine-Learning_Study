@@ -15,5 +15,7 @@ y^: 예측값
 y: 실제값
 J(θ): 바용함수
 
-행렬 제곱을 하려면 -> x=[1.2.3] 를 제곱하려면 x(전치) * x 이렇게 해주면 제곱효과 나옴.(내적)
+행렬 제곱을 하려면 -> x=[1.2.3] 를 제곱하려면 x(전치) * x 이렇게 해주면 제곱효과 나옴.(내적)<br>
+
+<img src="https://github.com/SeungMin2001/Hands-On_Machine-Learning_Study/blob/main/images/IMG_0252.jpg" width="300" height="400">
 
