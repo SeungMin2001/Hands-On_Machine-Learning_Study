@@ -3,3 +3,12 @@
 
 > "Hands-On Machine Learning with Scikit-Learn Keras & Tensorflow" 의 대한 공부 기록."  
 > — Aurelien Geron, 《Hands-On Machine Learning with Scikit-Learn Keras & Tensorflow 3판》, 2023
+
+
+
+
+<br>
+[1.]()
+[2.]()
+[3.]()
+[4.]()
